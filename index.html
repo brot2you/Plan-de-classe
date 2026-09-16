@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Plan de Classe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#1f4a3d;
+    --board-dark:#153630;
+    --board-frame:#5a3a22;
+    --chalk:#f4efe0;
+    --chalk-yellow:#f0c93b;
+    --wood:#c9884f;
+    --wood-dark:#8a5a2b;
+    --wood-light:#e3ac72;
+    --paper:#f6efd8;
+    --paper-dark:#e8dcb8;
+    --apple:#bf3a2c;
+    --apple-dark:#8f2a20;
+    --ink:#2c2418;
+    --ink-soft:#5b4f3d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    overflow:hidden;
+  }
+  #app{display:flex;flex-direction:column;height:100vh;}
+
+  /* ---------- HEADER ---------- */
+  header{
+    background:linear-gradient(180deg,var(--board) 0%,var(--board-dark) 100%);
+    border-bottom:10px solid var(--board-frame);
+    box-shadow:0 4px 0 rgba(0,0,0,0.25) inset, 0 3px 8px rgba(0,0,0,0.3);
+    padding:10px 16px 0 16px;
+    flex-shrink:0;
+  }
+  .header-top{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    margin-bottom:8px;
+  }
+  .title-chalk{
+    font-family:'Kalam',cursive;
+    font-weight:700;
+    font-size:26px;
+    color:var(--chalk);
+    text-shadow:0 0 6px rgba(255,255,255,0.15);
+    letter-spacing:0.5px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .save-indicator{
+    font-family:'Nunito',sans-serif;
+    font-size:13px;
+    color:var(--chalk-yellow);
+    opacity:0.85;
+    display:flex;align-items:center;gap:6px;
+  }
+  .save-dot{width:8px;height:8px;border-radius:50%;background:var(--chalk-yellow);transition:background 0.3s;}
+  .save-dot.saving{background:#f0a63b;}
+
+  .class-tabs{
+    display:flex;align-items:flex-end;gap:4px;overflow-x:auto;
+    padding-bottom:0;
+  }
+  .class-tab{
+    font-family:'Kalam',cursive;
+    font-size:16px;
+    background:var(--paper);
+    color:var(--ink);
+    border:none;
+    border-radius:8px 8px 0 0;
+    padding:8px 18px 9px 18px;
+    cursor:pointer;
+    white-space:nowrap;
+    position:relative;
+    opacity:0.6;
+    transform:translateY(4px);
+    transition:transform 0.15s, opacity 0.15s;
+  }
+  .class-tab.active{
+    opacity:1;
+    transform:translateY(0);
+    box-shadow:0 -2px 6px rgba(0,0,0,0.15);
+  }
+  .class-tab .del-tab{
+    margin-left:8px;font-size:12px;color:var(--apple);opacity:0;transition:opacity 0.15s;
+  }
+  .class-tab:hover .del-tab{opacity:0.7;}
+  .class-tab .del-tab:hover{opacity:1;}
+  .add-tab-btn{
+    font-family:'Kalam',cursive;font-size:20px;color:var(--chalk-yellow);
+    background:transparent;border:2px dashed rgba(244,239,224,0.4);border-radius:8px 8px 0 0;
+    padding:6px 14px;cursor:pointer;transform:translateY(4px);
+  }
+  .add-tab-btn:hover{background:rgba(244,239,224,0.08);}
+
+  /* ---------- BODY LAYOUT ---------- */
+  .body-wrap{display:flex;flex:1;min-height:0;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:250px;flex-shrink:0;background:var(--paper);
+    border-right:4px solid var(--paper-dark);
+    display:flex;flex-direction:column;
+    padding:14px 12px;
+    overflow-y:auto;
+  }
+  .sidebar h2{
+    font-family:'Kalam',cursive;font-size:18px;margin:0 0 8px 0;color:var(--ink);
+    display:flex;align-items:center;gap:6px;
+  }
+  .roster-count{font-size:12px;color:var(--ink-soft);font-weight:600;background:var(--paper-dark);border-radius:10px;padding:1px 8px;}
+
+  .btn{
+    font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
+    border:none;border-radius:8px;cursor:pointer;
+    padding:8px 12px;display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-apple{background:var(--apple);color:var(--chalk);box-shadow:0 3px 0 var(--apple-dark);}
+  .btn-apple:hover{filter:brightness(1.06);}
+  .btn-apple:active{box-shadow:0 1px 0 var(--apple-dark);}
+  .btn-wood{background:var(--wood);color:#3a2410;box-shadow:0 3px 0 var(--wood-dark);}
+  .btn-wood:active{box-shadow:0 1px 0 var(--wood-dark);}
+  .btn-outline{background:var(--paper);color:var(--ink);border:2px solid var(--paper-dark);box-shadow:none;}
+  .btn-outline:hover{background:var(--paper-dark);}
+  .btn-full{width:100%;margin-bottom:8px;}
+  .btn-small{padding:5px 8px;font-size:11px;}
+
+  .roster-list{list-style:none;margin:8px 0;padding:0;flex:1;overflow-y:auto;}
+  .roster-item{
+    display:flex;align-items:center;gap:8px;
+    background:#fff;border:2px solid var(--paper-dark);
+    border-radius:10px;padding:6px 8px;margin-bottom:6px;
+    cursor:grab;user-select:none;
+    box-shadow:0 2px 0 rgba(0,0,0,0.06);
+  }
+  .roster-item.seated{opacity:0.4;}
+  .roster-item:active{cursor:grabbing;}
+  .avatar{
+    width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    background:var(--wood-light);color:#4a2f10;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:13px;overflow:hidden;
+    border:2px solid var(--wood-dark);
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .roster-name{flex:1;font-size:13px;font-weight:700;line-height:1.15;}
+  .roster-item .del-student{color:var(--apple);opacity:0.5;cursor:pointer;font-size:14px;padding:0 2px;}
+  .roster-item .del-student:hover{opacity:1;}
+
+  .add-student-form{display:none;flex-direction:column;gap:6px;background:#fff;border:2px dashed var(--paper-dark);border-radius:10px;padding:8px;margin-bottom:8px;}
+  .add-student-form.open{display:flex;}
+  .add-student-form input[type=text]{
+    font-family:'Nunito',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--paper-dark);border-radius:6px;
+  }
+  .photo-row{display:flex;align-items:center;gap:8px;}
+  .photo-preview{width:36px;height:36px;border-radius:50%;background:var(--paper-dark);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .photo-preview img{width:100%;height:100%;object-fit:cover;}
+
+  .sidebar-actions{border-top:2px solid var(--paper-dark);padding-top:10px;margin-top:8px;}
+
+  .desk-toolbar{display:flex;gap:6px;margin-top:6px;}
+
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{flex:1;position:relative;overflow:auto;background:
+      repeating-linear-gradient(90deg, #b8865a 0 42px, #a97a4f 42px 44px);
+  }
+  .canvas{
+    position:relative;
+    min-width:900px;min-height:780px;
+    width:100%;
+  }
+  .board{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    width:60%;min-width:360px;max-width:640px;height:120px;
+    background:linear-gradient(180deg,#245c4c,#1a4438);
+    border:14px solid var(--board-frame);border-radius:6px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.25);
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+  }
+  .board span{
+    font-family:'Kalam',cursive;color:rgba(244,239,224,0.75);font-size:20px;letter-spacing:1px;
+  }
+  .desk{
+    position:absolute;
+    background:linear-gradient(180deg,var(--wood-light),var(--wood) 60%,var(--wood-dark));
+    border:3px solid var(--wood-dark);
+    border-radius:10px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.28);
+    display:flex;flex-direction:column;
+  }
+  .desk.drag-active{opacity:0.85;z-index:50;box-shadow:0 8px 18px rgba(0,0,0,0.4);}
+  .desk-handle{
+    height:16px;flex-shrink:0;
+    background:rgba(0,0,0,0.18);
+    border-radius:7px 7px 0 0;
+    cursor:grab;
+    display:flex;align-items:center;justify-content:center;
+    letter-spacing:2px;color:rgba(255,255,255,0.55);font-size:10px;
+    touch-action:none;
+  }
+  .desk-handle:active{cursor:grabbing;}
+  .desk-seats-row{display:flex;padding:6px;gap:4px;flex:1;}
+  .seat{
+    flex:1;min-width:70px;
+    background:rgba(255,255,255,0.14);
+    border:2px dashed rgba(255,255,255,0.35);
+    border-radius:7px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;padding:4px 2px;
+    position:relative;
+  }
+  .seat.filled{
+    background:rgba(255,255,255,0.85);
+    border:2px solid var(--wood-dark);
+    cursor:grab;
+  }
+  .seat.filled:active{cursor:grabbing;}
+  .seat .avatar{width:30px;height:30px;font-size:11px;}
+  .seat .seat-name{font-size:10.5px;font-weight:800;text-align:center;line-height:1.1;color:var(--ink);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .seat-empty-label{font-size:16px;color:rgba(255,255,255,0.6);}
+  .desk-remove{
+    position:absolute;top:-9px;right:-9px;width:20px;height:20px;border-radius:50%;
+    background:var(--apple);color:#fff;border:2px solid var(--paper);font-size:12px;line-height:1;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:800;
+    box-shadow:0 2px 4px rgba(0,0,0,0.3);
+    z-index:5;
+  }
+
+  /* Round "camembert" table */
+  .desk.round{
+    border-radius:50%;
+    display:block;
+    border:4px solid var(--wood-dark);
+    background:var(--wood);
+  }
+  .desk.round .seat{
+    position:absolute;width:50px;height:58px;
+    background:rgba(255,255,255,0.16);
+    border:2px dashed rgba(255,255,255,0.4);
+    flex:none;
+  }
+  .desk.round .seat.filled{
+    background:rgba(255,255,255,0.9);
+    border:2px solid var(--wood-dark);
+  }
+  .desk-hub{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:42px;height:42px;border-radius:50%;
+    background:var(--wood-dark);
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,0.7);font-size:15px;
+    cursor:grab;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);
+    touch-action:none;
+  }
+  .desk-hub:active{cursor:grabbing;}
+  .ghost-chip{
+    position:fixed;z-index:999;pointer-events:none;
+    background:#fff;border:2px solid var(--wood-dark);border-radius:10px;
+    padding:6px 10px;display:flex;align-items:center;gap:6px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.35);
+    font-size:13px;font-weight:700;
+    transform:translate(-50%,-50%);
+  }
+
+  .empty-canvas-hint{
+    position:absolute;top:40px;left:0;right:0;text-align:center;
+    font-family:'Kalam',cursive;color:rgba(255,255,255,0.55);font-size:18px;
+    pointer-events:none;
+  }
+
+  #photoInput{display:none;}
+
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--wood-dark);border-radius:6px;}
+  ::-webkit-scrollbar-track{background:var(--paper-dark);}
+
+  @media (max-width:760px){
+    .sidebar{width:190px;}
+    .title-chalk{font-size:20px;}
+  }
+
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(20,15,8,0.55);
+    display:none;align-items:center;justify-content:center;z-index:500;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{
+    background:var(--paper);border-radius:12px;padding:20px;width:280px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    font-family:'Nunito',sans-serif;
+  }
+  .modal h3{font-family:'Kalam',cursive;margin:0 0 10px 0;font-size:18px;}
+  .modal input{width:100%;padding:8px;border:2px solid var(--paper-dark);border-radius:6px;font-size:14px;margin-bottom:12px;font-family:'Nunito',sans-serif;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="header-top">
+      <div class="title-chalk">📚 Plan de Classe</div>
+      <div class="save-indicator"><span class="save-dot" id="saveDot"></span><span id="saveText">Enregistré</span></div>
+    </div>
+    <div class="class-tabs" id="classTabs"></div>
+  </header>
+
+  <div class="body-wrap">
+    <div class="sidebar">
+      <h2>🧑‍🎓 Élèves <span class="roster-count" id="rosterCount">0</span></h2>
+
+      <button class="btn btn-apple btn-full" id="toggleAddForm">+ Ajouter un élève</button>
+      <div class="add-student-form" id="addForm">
+        <input type="text" id="newStudentName" placeholder="Nom de l'élève">
+        <div class="photo-row">
+          <div class="photo-preview" id="photoPreview">🙂</div>
+          <button class="btn btn-outline btn-small" id="pickPhotoBtn" type="button">Photo</button>
+        </div>
+        <button class="btn btn-wood btn-small" id="confirmAddStudent" type="button">Ajouter</button>
+      </div>
+
+      <ul class="roster-list" id="rosterList"></ul>
+
+      <div class="sidebar-actions">
+        <div style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;">🧀 Table camembert</div>
+        <div class="desk-toolbar" style="align-items:center;margin-bottom:6px;">
+          <button class="btn btn-outline btn-small" id="seatsMinus" style="width:28px;flex:none;">−</button>
+          <div id="seatsCountLabel" style="flex:1;text-align:center;font-weight:800;font-size:13px;">5 places</div>
+          <button class="btn btn-outline btn-small" id="seatsPlus" style="width:28px;flex:none;">+</button>
+        </div>
+        <button class="btn btn-wood btn-full" id="addDeskRound" style="margin-bottom:6px;">+ Ajouter une table ronde</button>
+        <button class="btn btn-outline btn-full" id="quickSetupRound">🎯 Disposer 6 tables camembert</button>
+        <div style="font-size:12px;font-weight:700;color:var(--ink-soft);margin:10px 0 4px 0;">🪑 Tables rectangulaires</div>
+        <div class="desk-toolbar">
+          <button class="btn btn-wood btn-small" id="addDeskDuo" style="flex:1;">+ Duo</button>
+          <button class="btn btn-wood btn-small" id="addDeskSingle" style="flex:1;">+ Simple</button>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn btn-outline btn-full" id="duplicateClassBtn">⧉ Dupliquer la classe</button>
+        <button class="btn btn-outline btn-full" id="printBtn">🖨️ Imprimer le plan</button>
+        <button class="btn btn-outline btn-full" id="exportBtn">⬇ Exporter (.json)</button>
+        <button class="btn btn-outline btn-full" id="importBtn">⬆ Importer (.json)</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <div class="canvas" id="canvas">
+        <div class="board"><span id="boardLabel">TABLEAU</span></div>
+        <div class="empty-canvas-hint" id="emptyHint">Ajoutez des tables, puis glissez les élèves dessus ✏️</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*">
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Nouvelle classe</h3>
+    <p id="modalMessage" style="display:none;font-size:14px;line-height:1.4;margin:0 0 14px 0;"></p>
+    <input type="text" id="modalInput" placeholder="Nom de la classe">
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-small" id="modalCancel">Annuler</button>
+      <button class="btn btn-apple btn-small" id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="importInput" accept="application/json" style="display:none;">
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "planDeClasseData_v1";
+  var state = null;
+  var pendingPhoto = null;
+  var modalCallback = null;
+
+  var elClassTabs = document.getElementById("classTabs");
+  var elRosterList = document.getElementById("rosterList");
+  var elRosterCount = document.getElementById("rosterCount");
+  var elCanvas = document.getElementById("canvas");
+  var elEmptyHint = document.getElementById("emptyHint");
+  var elSaveDot = document.getElementById("saveDot");
+  var elSaveText = document.getElementById("saveText");
+
+  function uid(prefix){
+    return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function defaultState(){
+    var c = { id: uid("c"), name: "Classe 1", students: [], desks: [] };
+    return { classes: [c], activeClassId: c.id };
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(parsed && parsed.classes && parsed.classes.length){
+          return parsed;
+        }
+      }
+    }catch(e){}
+    return defaultState();
+  }
+
+  var saveTimer = null;
+  function persist(){
+    elSaveDot.className = "save-dot saving";
+    elSaveText.textContent = "Enregistrement...";
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        elSaveDot.className = "save-dot";
+        elSaveText.textContent = "Enregistré";
+      }catch(e){
+        elSaveText.textContent = "Erreur de sauvegarde (stockage plein ?)";
+      }
+    }, 250);
+  }
+
+  function getActiveClass(){
+    for(var i=0;i<state.classes.length;i++){
+      if(state.classes[i].id === state.activeClassId) return state.classes[i];
+    }
+    return state.classes[0];
+  }
+
+  function findStudent(cls, studentId){
+    for(var i=0;i<cls.students.length;i++){
+      if(cls.students[i].id === studentId) return cls.students[i];
+    }
+    return null;
+  }
+
+  function isSeated(cls, studentId){
+    for(var i=0;i<cls.desks.length;i++){
+      var seats = cls.desks[i].seats;
+      for(var j=0;j<seats.length;j++){
+        if(seats[j] === studentId) return true;
+      }
+    }
+    return false;
+  }
+
+  function unseatStudentEverywhere(cls, studentId){
+    for(var i=0;i<cls.desks.length;i++){
+      var seats = cls.desks[i].seats;
+      for(var j=0;j<seats.length;j++){
+        if(seats[j] === studentId) seats[j] = null;
+      }
+    }
+  }
+
+  function initials(name){
+    var parts = name.trim().split(/\s+/);
+    var s = "";
+    for(var i=0;i<Math.min(2,parts.length);i++){
+      if(parts[i].length) s += parts[i][0].toUpperCase();
+    }
+    return s || "?";
+  }
+
+  /* ---------------- RENDER ---------------- */
+
+  function renderAll(){
+    renderTabs();
+    renderRoster();
+    renderCanvas();
+  }
+
+  function renderTabs(){
+    elClassTabs.innerHTML = "";
+    for(var i=0;i<state.classes.length;i++){
+      (function(cls){
+        var tab = document.createElement("button");
+        tab.className = "class-tab" + (cls.id === state.activeClassId ? " active" : "");
+        tab.type = "button";
+        var label = document.createElement("span");
+        label.textContent = cls.name;
+        tab.appendChild(label);
+        var del = document.createElement("span");
+        del.className = "del-tab";
+        del.textContent = "✕";
+        del.title = "Supprimer cette classe";
+        del.addEventListener("click", function(ev){
+          ev.stopPropagation();
+          if(state.classes.length <= 1){
+            customAlert("Impossible de supprimer la dernière classe.");
+            return;
+          }
+          customConfirm('Supprimer la classe "' + cls.name + '" et tous ses élèves/tables ?', function(){
+            state.classes = state.classes.filter(function(c){ return c.id !== cls.id; });
+            if(state.activeClassId === cls.id){
+              state.activeClassId = state.classes[0].id;
+            }
+            persist();
+            renderAll();
+          });
+        });
+        tab.appendChild(del);
+        tab.addEventListener("click", function(){
+          state.activeClassId = cls.id;
+          renderAll();
+        });
+        tab.addEventListener("dblclick", function(){
+          openModal("Renommer la classe", cls.name, function(newName){
+            cls.name = newName;
+            persist();
+            renderAll();
+          });
+        });
+        elClassTabs.appendChild(tab);
+      })(state.classes[i]);
+    }
+    var addBtn = document.createElement("button");
+    addBtn.className = "add-tab-btn";
+    addBtn.type = "button";
+    addBtn.textContent = "+";
+    addBtn.title = "Nouvelle classe";
+    addBtn.addEventListener("click", function(){
+      openModal("Nouvelle classe", "", function(name){
+        var c = { id: uid("c"), name: name, students: [], desks: [] };
+        state.classes.push(c);
+        state.activeClassId = c.id;
+        persist();
+        renderAll();
+      });
+    });
+    elClassTabs.appendChild(addBtn);
+  }
+
+  function makeAvatar(student){
+    var av = document.createElement("div");
+    av.className = "avatar";
+    if(student.photo){
+      var img = document.createElement("img");
+      img.src = student.photo;
+      av.appendChild(img);
+    } else {
+      av.textContent = initials(student.name);
+    }
+    return av;
+  }
+
+  function renderRoster(){
+    var cls = getActiveClass();
+    elRosterList.innerHTML = "";
+    elRosterCount.textContent = cls.students.length;
+    for(var i=0;i<cls.students.length;i++){
+      (function(student){
+        var li = document.createElement("li");
+        var seated = isSeated(cls, student.id);
+        li.className = "roster-item" + (seated ? " seated" : "");
+        li.setAttribute("data-student-id", student.id);
+        li.appendChild(makeAvatar(student));
+        var nm = document.createElement("div");
+        nm.className = "roster-name";
+        nm.textContent = student.name + (seated ? "  (placé)" : "");
+        li.appendChild(nm);
+        var del = document.createElement("span");
+        del.className = "del-student";
+        del.textContent = "✕";
+        del.addEventListener("click", function(ev){
+          ev.stopPropagation();
+          customConfirm('Retirer "' + student.name + '" de la classe ?', function(){
+            unseatStudentEverywhere(cls, student.id);
+            cls.students = cls.students.filter(function(s){ return s.id !== student.id; });
+            persist();
+            renderAll();
+          });
+        });
+        li.appendChild(del);
+        attachDragStudent(li, student.id, null);
+        elRosterList.appendChild(li);
+      })(cls.students[i]);
+    }
+  }
+
+  function makeSeatEl(cls, desk, seatIndex){
+    var studentId = desk.seats[seatIndex];
+    var seatEl = document.createElement("div");
+    seatEl.className = "seat" + (studentId ? " filled" : "");
+    if(studentId){
+      var student = findStudent(cls, studentId);
+      if(student){
+        seatEl.appendChild(makeAvatar(student));
+        var nmEl = document.createElement("div");
+        nmEl.className = "seat-name";
+        nmEl.textContent = student.name;
+        seatEl.appendChild(nmEl);
+        attachDragStudent(seatEl, studentId, { deskId: desk.id, seatIndex: seatIndex });
+      }
+    } else {
+      var lbl = document.createElement("div");
+      lbl.className = "seat-empty-label";
+      lbl.textContent = "+";
+      seatEl.appendChild(lbl);
+    }
+    return seatEl;
+  }
+
+  function renderCanvas(){
+    var cls = getActiveClass();
+    var existing = elCanvas.querySelectorAll(".desk");
+    for(var e=0;e<existing.length;e++){ existing[e].parentNode.removeChild(existing[e]); }
+    elEmptyHint.style.display = cls.desks.length === 0 ? "block" : "none";
+
+    for(var i=0;i<cls.desks.length;i++){
+      (function(desk, tableNum){
+        var deskEl = document.createElement("div");
+        deskEl.setAttribute("data-desk-id", desk.id);
+
+        var rm = document.createElement("div");
+        rm.className = "desk-remove";
+        rm.textContent = "✕";
+        rm.addEventListener("click", function(ev){
+          ev.stopPropagation();
+          var occupied = desk.seats.some(function(s){ return !!s; });
+          function doRemove(){
+            cls.desks = cls.desks.filter(function(d){ return d.id !== desk.id; });
+            persist();
+            renderCanvas();
+            renderRoster();
+          }
+          if(occupied){
+            customConfirm("Cette table est occupée. La supprimer quand même ?", doRemove);
+          } else {
+            doRemove();
+          }
+        });
+
+        if(desk.shape === "round"){
+          var n = desk.seats.length;
+          var diameter = Math.max(140, 70 + n*24);
+          deskEl.className = "desk round";
+          deskEl.style.left = desk.x + "px";
+          deskEl.style.top = desk.y + "px";
+          deskEl.style.width = diameter + "px";
+          deskEl.style.height = diameter + "px";
+
+          var slice = 360/n;
+          deskEl.style.background =
+            "repeating-conic-gradient(from -" + (slice/2) + "deg, rgba(0,0,0,0.3) 0deg 1.2deg, transparent 1.2deg " + slice + "deg), " +
+            "radial-gradient(circle, var(--wood-light) 0%, var(--wood) 65%, var(--wood-dark) 100%)";
+
+          var hub = document.createElement("div");
+          hub.className = "desk-hub";
+          hub.textContent = tableNum;
+          deskEl.appendChild(hub);
+          attachDragDesk(hub, deskEl, desk);
+
+          var radius = diameter/2 - 32;
+          for(var s=0;s<n;s++){
+            (function(seatIndex){
+              var angle = ((seatIndex + 0.5) * slice - 90) * Math.PI/180;
+              var cx = diameter/2 + radius*Math.cos(angle);
+              var cy = diameter/2 + radius*Math.sin(angle);
+              var seatEl = makeSeatEl(cls, desk, seatIndex);
+              seatEl.style.left = (cx - 25) + "px";
+              seatEl.style.top = (cy - 29) + "px";
+              deskEl.appendChild(seatEl);
+            })(s);
+          }
+          deskEl.appendChild(rm);
+        } else {
+          deskEl.className = "desk";
+          deskEl.style.left = desk.x + "px";
+          deskEl.style.top = desk.y + "px";
+          deskEl.style.width = (desk.seats.length === 2 ? 172 : 96) + "px";
+          deskEl.style.height = "92px";
+
+          var handle = document.createElement("div");
+          handle.className = "desk-handle";
+          handle.textContent = "⋮⋮⋮";
+          deskEl.appendChild(handle);
+          attachDragDesk(handle, deskEl, desk);
+
+          var row = document.createElement("div");
+          row.className = "desk-seats-row";
+          for(var r=0;r<desk.seats.length;r++){
+            row.appendChild(makeSeatEl(cls, desk, r));
+          }
+          deskEl.appendChild(row);
+          deskEl.appendChild(rm);
+        }
+
+        elCanvas.appendChild(deskEl);
+      })(cls.desks[i], i+1);
+    }
+  }
+
+  /* ---------------- DRAG: DESK MOVE ---------------- */
+
+  function attachDragDesk(handleEl, deskEl, desk){
+    var startX, startY, origX, origY, dragging = false;
+
+    function onDown(clientX, clientY){
+      startX = clientX; startY = clientY;
+      origX = desk.x; origY = desk.y;
+      dragging = true;
+      deskEl.classList.add("drag-active");
+    }
+    function onMove(clientX, clientY){
+      if(!dragging) return;
+      var dx = clientX - startX, dy = clientY - startY;
+      var w = deskEl.offsetWidth, h = deskEl.offsetHeight;
+      var maxX = Math.max(0, elCanvas.scrollWidth - w);
+      var maxY = Math.max(0, elCanvas.scrollHeight - h);
+      var nx = Math.min(Math.max(0, origX + dx), maxX);
+      var ny = Math.min(Math.max(0, origY + dy), maxY);
+      desk.x = nx; desk.y = ny;
+      deskEl.style.left = nx + "px";
+      deskEl.style.top = ny + "px";
+    }
+    function onUp(){
+      if(!dragging) return;
+      dragging = false;
+      deskEl.classList.remove("drag-active");
+      persist();
+    }
+
+    handleEl.addEventListener("mousedown", function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      onDown(ev.clientX, ev.clientY);
+      function mm(e){ onMove(e.clientX, e.clientY); }
+      function mu(e){ onUp(); document.removeEventListener("mousemove", mm); document.removeEventListener("mouseup", mu); }
+      document.addEventListener("mousemove", mm);
+      document.addEventListener("mouseup", mu);
+    });
+
+    handleEl.addEventListener("touchstart", function(ev){
+      ev.stopPropagation();
+      var t = ev.touches[0];
+      onDown(t.clientX, t.clientY);
+      function tm(e){ var t2 = e.touches[0]; onMove(t2.clientX, t2.clientY); e.preventDefault(); }
+      function tu(){ onUp(); document.removeEventListener("touchmove", tm); document.removeEventListener("touchend", tu); }
+      document.addEventListener("touchmove", tm, {passive:false});
+      document.addEventListener("touchend", tu);
+    }, {passive:true});
+  }
+
+  /* ---------------- DRAG: STUDENT SEATING ---------------- */
+
+  var ghostEl = null;
+
+  function attachDragStudent(handleEl, studentId, fromDesk){
+    function startDrag(clientX, clientY){
+      var cls = getActiveClass();
+      var student = findStudent(cls, studentId);
+      if(!student) return;
+
+      ghostEl = document.createElement("div");
+      ghostEl.className = "ghost-chip";
+      ghostEl.innerHTML = "";
+      var av = makeAvatar(student);
+      av.style.width = "24px"; av.style.height = "24px";
+      ghostEl.appendChild(av);
+      var lbl = document.createElement("span");
+      lbl.textContent = student.name;
+      ghostEl.appendChild(lbl);
+      document.body.appendChild(ghostEl);
+      moveGhost(clientX, clientY);
+      handleEl.style.opacity = "0.35";
+
+      function onMove(cx, cy){ moveGhost(cx, cy); }
+      function onEnd(cx, cy){
+        handleEl.style.opacity = "";
+        if(ghostEl){ ghostEl.parentNode.removeChild(ghostEl); ghostEl = null; }
+        dropStudentAt(cx, cy, studentId, fromDesk);
+      }
+
+      function mm(e){ onMove(e.clientX, e.clientY); }
+      function mu(e){
+        document.removeEventListener("mousemove", mm);
+        document.removeEventListener("mouseup", mu);
+        onEnd(e.clientX, e.clientY);
+      }
+      function tm(e){ var t = e.touches[0]; onMove(t.clientX, t.clientY); e.preventDefault(); }
+      function tu(e){
+        document.removeEventListener("touchmove", tm);
+        document.removeEventListener("touchend", tu);
+        var t = e.changedTouches[0];
+        onEnd(t.clientX, t.clientY);
+      }
+
+      if(clientX !== null){
+        document.addEventListener("mousemove", mm);
+        document.addEventListener("mouseup", mu);
+      }
+      handleEl._tm = tm; handleEl._tu = tu;
+      document.addEventListener("touchmove", tm, {passive:false});
+      document.addEventListener("touchend", tu);
+    }
+
+    handleEl.addEventListener("mousedown", function(ev){
+      if(ev.target.closest && ev.target.closest(".del-student")) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      startDrag(ev.clientX, ev.clientY);
+    });
+    handleEl.addEventListener("touchstart", function(ev){
+      if(ev.target.closest && ev.target.closest(".del-student")) return;
+      ev.stopPropagation();
+      var t = ev.touches[0];
+      startDrag(t.clientX, t.clientY);
+    }, {passive:true});
+  }
+
+  function moveGhost(x, y){
+    if(!ghostEl) return;
+    ghostEl.style.left = x + "px";
+    ghostEl.style.top = y + "px";
+  }
+
+  function dropStudentAt(clientX, clientY, studentId, fromDesk){
+    var cls = getActiveClass();
+    var el = document.elementFromPoint(clientX, clientY);
+    if(!el) return;
+    var seatEl = el.closest ? el.closest(".seat") : null;
+    var rosterEl = el.closest ? el.closest(".roster-list") : null;
+
+    if(seatEl){
+      var deskEl = seatEl.closest(".desk");
+      var deskId = deskEl.getAttribute("data-desk-id");
+      var desk = null;
+      for(var i=0;i<cls.desks.length;i++){ if(cls.desks[i].id === deskId) desk = cls.desks[i]; }
+      if(!desk) return;
+      var seatIndex = Array.prototype.indexOf.call(deskEl.querySelectorAll(".seat"), seatEl);
+      var occupantId = desk.seats[seatIndex];
+
+      if(occupantId === studentId){ return; }
+
+      if(fromDesk){
+        var fromDeskObj = null;
+        for(var j=0;j<cls.desks.length;j++){ if(cls.desks[j].id === fromDesk.deskId) fromDeskObj = cls.desks[j]; }
+        if(fromDeskObj) fromDeskObj.seats[fromDesk.seatIndex] = null;
+      }
+      if(occupantId){
+        if(fromDesk){
+          var fdo = null;
+          for(var k=0;k<cls.desks.length;k++){ if(cls.desks[k].id === fromDesk.deskId) fdo = cls.desks[k]; }
+          if(fdo) fdo.seats[fromDesk.seatIndex] = occupantId;
+        } else {
+          unseatStudentEverywhere(cls, occupantId);
+        }
+      }
+      unseatStudentEverywhere(cls, studentId);
+      desk.seats[seatIndex] = studentId;
+      persist();
+      renderCanvas();
+      renderRoster();
+    } else if(rosterEl){
+      unseatStudentEverywhere(cls, studentId);
+      persist();
+      renderCanvas();
+      renderRoster();
+    }
+  }
+
+  /* ---------------- MODAL ---------------- */
+
+  var modalBg = document.getElementById("modalBg");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalInput = document.getElementById("modalInput");
+  var modalMessage = document.getElementById("modalMessage");
+  var modalOkBtn = document.getElementById("modalOk");
+  var modalCancelBtn = document.getElementById("modalCancel");
+  var modalMode = "prompt";
+
+  function openModal(title, value, cb){
+    modalMode = "prompt";
+    modalTitle.textContent = title;
+    modalMessage.style.display = "none";
+    modalInput.style.display = "block";
+    modalInput.value = value;
+    modalCancelBtn.style.display = "inline-flex";
+    modalOkBtn.textContent = "OK";
+    modalCallback = cb;
+    modalBg.classList.add("open");
+    setTimeout(function(){ modalInput.focus(); modalInput.select(); }, 30);
+  }
+
+  function customConfirm(message, onYes){
+    modalMode = "confirm";
+    modalTitle.textContent = "Confirmation";
+    modalMessage.textContent = message;
+    modalMessage.style.display = "block";
+    modalInput.style.display = "none";
+    modalCancelBtn.style.display = "inline-flex";
+    modalOkBtn.textContent = "Oui";
+    modalCallback = onYes;
+    modalBg.classList.add("open");
+  }
+
+  function customAlert(message){
+    modalMode = "alert";
+    modalTitle.textContent = "Information";
+    modalMessage.textContent = message;
+    modalMessage.style.display = "block";
+    modalInput.style.display = "none";
+    modalCancelBtn.style.display = "none";
+    modalOkBtn.textContent = "OK";
+    modalCallback = null;
+    modalBg.classList.add("open");
+  }
+
+  function closeModal(){ modalBg.classList.remove("open"); modalCallback = null; }
+  modalCancelBtn.addEventListener("click", closeModal);
+  modalOkBtn.addEventListener("click", function(){
+    if(modalMode === "prompt"){
+      var v = modalInput.value.trim();
+      if(v && modalCallback) modalCallback(v);
+    } else if(modalMode === "confirm"){
+      if(modalCallback) modalCallback();
+    }
+    closeModal();
+  });
+  modalInput.addEventListener("keydown", function(ev){
+    if(ev.key === "Enter") modalOkBtn.click();
+    if(ev.key === "Escape") closeModal();
+  });
+  modalBg.addEventListener("click", function(ev){ if(ev.target === modalBg) closeModal(); });
+
+  /* ---------------- ADD STUDENT FORM ---------------- */
+
+  var addForm = document.getElementById("addForm");
+  document.getElementById("toggleAddForm").addEventListener("click", function(){
+    addForm.classList.toggle("open");
+    if(addForm.classList.contains("open")) document.getElementById("newStudentName").focus();
+  });
+
+  var photoInput = document.getElementById("photoInput");
+  document.getElementById("pickPhotoBtn").addEventListener("click", function(){
+    photoInput.click();
+  });
+  photoInput.addEventListener("change", function(){
+    var file = photoInput.files && photoInput.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var img = new Image();
+      img.onload = function(){
+        var size = 96;
+        var canvasEl = document.createElement("canvas");
+        canvasEl.width = size; canvasEl.height = size;
+        var ctx = canvasEl.getContext("2d");
+        var scale = Math.max(size/img.width, size/img.height);
+        var w = img.width*scale, h = img.height*scale;
+        ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+        pendingPhoto = canvasEl.toDataURL("image/jpeg", 0.85);
+        var prev = document.getElementById("photoPreview");
+        prev.innerHTML = "";
+        var pimg = document.createElement("img");
+        pimg.src = pendingPhoto;
+        prev.appendChild(pimg);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("confirmAddStudent").addEventListener("click", function(){
+    var nameInput = document.getElementById("newStudentName");
+    var name = nameInput.value.trim();
+    if(!name){ nameInput.focus(); return; }
+    var cls = getActiveClass();
+    cls.students.push({ id: uid("s"), name: name, photo: pendingPhoto });
+    persist();
+    nameInput.value = "";
+    pendingPhoto = null;
+    document.getElementById("photoPreview").innerHTML = "🙂";
+    addForm.classList.remove("open");
+    renderRoster();
+  });
+  document.getElementById("newStudentName").addEventListener("keydown", function(ev){
+    if(ev.key === "Enter") document.getElementById("confirmAddStudent").click();
+  });
+
+  /* ---------------- DESKS ---------------- */
+
+  function addDesk(seatsCount){
+    var cls = getActiveClass();
+    var n = cls.desks.length;
+    var col = n % 4, row = Math.floor(n/4);
+    var desk = {
+      id: uid("d"),
+      x: 40 + col * 190,
+      y: 190 + row * 110,
+      shape: "rect",
+      seats: seatsCount === 2 ? [null, null] : [null]
+    };
+    cls.desks.push(desk);
+    persist();
+    renderCanvas();
+  }
+  document.getElementById("addDeskDuo").addEventListener("click", function(){ addDesk(2); });
+  document.getElementById("addDeskSingle").addEventListener("click", function(){ addDesk(1); });
+
+  var roundSeatsCount = 5;
+  var seatsCountLabel = document.getElementById("seatsCountLabel");
+  function updateSeatsLabel(){ seatsCountLabel.textContent = roundSeatsCount + " places"; }
+  document.getElementById("seatsMinus").addEventListener("click", function(){
+    if(roundSeatsCount > 3){ roundSeatsCount--; updateSeatsLabel(); }
+  });
+  document.getElementById("seatsPlus").addEventListener("click", function(){
+    if(roundSeatsCount < 8){ roundSeatsCount++; updateSeatsLabel(); }
+  });
+
+  function addRoundDeskAt(cls, x, y, seatsCount){
+    var desk = {
+      id: uid("d"), x: x, y: y, shape: "round",
+      seats: (function(){ var a=[]; for(var i=0;i<seatsCount;i++) a.push(null); return a; })()
+    };
+    cls.desks.push(desk);
+    return desk;
+  }
+
+  document.getElementById("addDeskRound").addEventListener("click", function(){
+    var cls = getActiveClass();
+    var n = cls.desks.length;
+    addRoundDeskAt(cls, 60 + (n%3)*220, 40 + Math.floor(n/3)*220, roundSeatsCount);
+    persist();
+    renderCanvas();
+  });
+
+  document.getElementById("quickSetupRound").addEventListener("click", function(){
+    var cls = getActiveClass();
+    function doSetup(){
+      cls.desks = [];
+      var positions = [
+        {x:60,  y:400}, {x:60,  y:200}, {x:60,  y:0},
+        {x:480, y:400}, {x:480, y:200}, {x:480, y:0}
+      ];
+      for(var i=0;i<positions.length;i++){
+        addRoundDeskAt(cls, positions[i].x, positions[i].y, 5);
+      }
+      persist();
+      renderCanvas();
+    }
+    if(cls.desks.length > 0){
+      customConfirm("Cela remplace les tables actuelles de cette classe par 6 tables camembert. Continuer ?", doSetup);
+    } else {
+      doSetup();
+    }
+  });
+
+  /* ---------------- CLASS ACTIONS ---------------- */
+
+  document.getElementById("duplicateClassBtn").addEventListener("click", function(){
+    var cls = getActiveClass();
+    openModal("Nom de la copie", cls.name + " (copie)", function(newName){
+      var idMap = {};
+      var newStudents = cls.students.map(function(s){
+        var ns = { id: uid("s"), name: s.name, photo: s.photo };
+        idMap[s.id] = ns.id;
+        return ns;
+      });
+      var newDesks = cls.desks.map(function(d){
+        return {
+          id: uid("d"), x: d.x, y: d.y, shape: d.shape || "rect",
+          seats: d.seats.map(function(sid){ return sid ? idMap[sid] : null; })
+        };
+      });
+      var newClass = { id: uid("c"), name: newName, students: newStudents, desks: newDesks };
+      state.classes.push(newClass);
+      state.activeClassId = newClass.id;
+      persist();
+      renderAll();
+    });
+  });
+
+  document.getElementById("printBtn").addEventListener("click", function(){
+    window.print();
+  });
+
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    var cls = getActiveClass();
+    var blob = new Blob([JSON.stringify(cls, null, 2)], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = (cls.name || "classe").replace(/[^a-z0-9\-_ ]/gi,"_") + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  var importInput = document.getElementById("importInput");
+  document.getElementById("importBtn").addEventListener("click", function(){ importInput.click(); });
+  importInput.addEventListener("change", function(){
+    var file = importInput.files && importInput.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var data = JSON.parse(ev.target.result);
+        if(!data.students || !data.desks){ customAlert("Fichier invalide."); return; }
+        data.id = uid("c");
+        if(!data.name) data.name = "Classe importée";
+        state.classes.push(data);
+        state.activeClassId = data.id;
+        persist();
+        renderAll();
+      }catch(e){
+        customAlert("Impossible de lire ce fichier JSON.");
+      }
+    };
+    reader.readAsText(file);
+    importInput.value = "";
+  });
+
+  /* ---------------- INIT ---------------- */
+
+  state = load();
+  renderAll();
+  persist();
+
+})();
+</script>
+</body>
+</html>
